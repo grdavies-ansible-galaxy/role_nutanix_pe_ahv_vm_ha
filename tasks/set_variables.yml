@@ -1,0 +1,125 @@
+---
+- name: Get current cluster configuration
+  uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v2.0/cluster"
+    method: GET
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+    return_content: true
+  register: nutanix_prism_cluster_current_config
+
+- name: Debug nutanix_prism_cluster_current_config.json
+  debug:
+    var: nutanix_prism_cluster_current_config.json
+  when:
+    - nutanix_debug
+
+- name: Set fact nutanix_hypervisor_is_ahv
+  set_fact:
+    nutanix_hypervisor_is_ahv:
+  when: '"kKvm" in nutanix_prism_cluster_current_config.json.hypervisor_types'
+
+- name: Debug nutanix_hypervisor_is_ahv
+  debug:
+    var: nutanix_hypervisor_is_ahv
+  when:
+    - nutanix_debug
+
+- name: Set fact cluster_rf_level
+  set_fact:
+    nutanix_cluster_rf_level: "{{ nutanix_prism_cluster_current_config.json.cluster_redundancy_state.current_redundancy_factor }}"
+
+- name: Debug nutanix_cluster_rf_level
+  debug:
+    var: nutanix_cluster_rf_level
+  when:
+    - nutanix_debug
+
+- name: Get current HA config
+  uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v2.0/ha"
+    method: GET
+    validate_certs: "{{ validate_certs }}"
+    body_format: json
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+    return_content: true
+  register: nutanix_prism_ha_current_config
+
+- name: Debug nutanix_prism_ha_current_config.json
+  debug:
+    var: nutanix_prism_ha_current_config.json
+  when:
+    - nutanix_debug
+
+- name: Set default nutanix_prism_ha_failover_enabled for "{{ nutanix_prism_desired_ha_state }}"
+  set_fact:
+    cluster_rf_level: "{{ nutanix_prism_cluster_current_config.json.cluster_redundancy_state.current_redundancy_factor }}"
+    nutanix_prism_ha_failover_enabled: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('failover_enabled') }}"
+    nutanix_prism_ha_res_type: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('reservation_type') }}"
+    nutanix_prism_ha_res_type_comp: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('reservation_type_comparison') }}"
+  vars:
+    query: "[?ha_state==`{{ nutanix_prism_desired_ha_state }}`]"
+  when:
+    - nutanix_prism_ha_failover_enabled is undefined
+
+- name: Debug nutanix_prism_ha_failover_enabled
+  debug:
+    var: nutanix_prism_ha_failover_enabled
+  when:
+    - nutanix_debug
+
+- name: Debug nutanix_prism_ha_failover_enabled
+  debug:
+    var: nutanix_prism_ha_failover_enabled
+  when:
+    - nutanix_debug
+
+- name: Debug nutanix_prism_ha_res_type
+  debug:
+    var: nutanix_prism_ha_res_type
+  when:
+    - nutanix_debug
+
+- name: Debug nutanix_prism_ha_res_type_comp
+  debug:
+    var: nutanix_prism_ha_res_type_comp
+  when:
+    - nutanix_debug
+
+- name: Set default nutanix_prism_ha_host_failures for "{{ nutanix_prism_desired_ha_state }}"
+  set_fact:
+    nutanix_prism_ha_host_failures: "{{ nutanix_cluster_rf_level | int - 1 }}"
+  when:
+    - nutanix_prism_ha_host_failures is undefined
+    - nutanix_prism_desired_ha_state != "BestEffort"
+
+- name: Debug nutanix_prism_ha_host_failures
+  debug:
+    var: nutanix_prism_ha_host_failures
+  when:
+    - nutanix_debug
+
+- name: Set default nutanix_prism_ha_host_failures for "BestEffort"
+  set_fact:
+    nutanix_prism_ha_host_failures: "0"
+  when:
+    - nutanix_prism_ha_host_failures is undefined
+    - nutanix_prism_desired_ha_state == "BestEffort"
+
+- name: Compare current HA config to desired state
+  set_fact:
+    nutanix_prism_ha_update:
+  when:
+    ( nutanix_prism_ha_current_config.json.ha_state != nutanix_prism_desired_ha_state or
+    nutanix_prism_ha_current_config.json.failover_enabled != nutanix_prism_ha_failover_enabled or
+    nutanix_prism_ha_current_config.json.reservation_type != nutanix_prism_ha_res_type_comp or
+    nutanix_prism_ha_current_config.json.num_host_failures_to_tolerate | int != nutanix_prism_ha_host_failures | int )
+
+- name: Debug nutanix_prism_ha_update
+  debug:
+    var: nutanix_prism_ha_update
+  when:
+    - nutanix_debug

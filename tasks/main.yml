@@ -1,0 +1,22 @@
+---
+# tasks file for nutanix_role_prism_ha
+- name: Setup connection to Nutanix API
+  ansible.builtin.include_tasks: setup_api.yml
+
+- name: "Task can only be run against Prism Element"
+  ansible.builtin.fail:
+    msg: "'nutanix_host' needs to be set to the VIP of a Nutanix cluster. Please check the variable and try again."
+  when:
+    - nutanix_endpoint_prism_type != 'pe'
+
+- name: Check input variables
+  include_tasks: check_inputs.yml
+
+- name: Gather variables for HA configuration update
+  include_tasks: set_variables.yml
+
+- name: Perform Prism HA configuration update if necessary
+  include_tasks: update_ha.yml
+  when:
+    - nutanix_prism_ha_update is defined
+    - nutanix_hypervisor_is_ahv is defined

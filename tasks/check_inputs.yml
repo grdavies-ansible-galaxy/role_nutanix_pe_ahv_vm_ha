@@ -1,0 +1,8 @@
+---
+- name: Check HA state input value
+  ansible.builtin.fail:
+    msg:
+      "nutanix_prism_desired_ha_state: '{{ nutanix_prism_desired_ha_state }}' is not allowed. \
+      Please set nutanix_prism_desired_ha_state to one of these values; {{ nutanix_prism_allowed_ha_states }}"
+  when:
+    - nutanix_prism_desired_ha_state not in nutanix_prism_allowed_ha_states

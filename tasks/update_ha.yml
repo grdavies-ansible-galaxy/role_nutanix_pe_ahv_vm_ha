@@ -1,0 +1,30 @@
+---
+- name: Update AHV VM HA configuration
+  uri:
+    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v2.0/ha"
+    method: PUT
+    validate_certs: "{{ validate_certs }}"
+    body: "{{ lookup('template', 'ha.j2') | from_yaml | to_json }}"
+    body_format: json
+    status_code: 200
+    headers:
+      Authorization: "{{ nutanix_api_auth }}"
+    return_content: true
+  register: nutanix_prism_ha_update_task
+  changed_when: true
+
+- name: Debug nutanix_prism_ha_update_task
+  debug:
+    var: nutanix_prism_ha_update_task
+  when:
+    - nutanix_debug
+
+- name: Wait for AHV VM HA configuration task to complete
+  ansible.builtin.import_role:
+    name: grdavies.role_nutanix_prism_monitor_task
+  vars:
+    nutanix_task_uuid: "{{ nutanix_prism_ha_update_task.json.task_uuid }}"
+
+- name: Set prism_ha_update_task_status
+  set_fact:
+    prism_ha_update_task_status: "{{ monitored_task }}"

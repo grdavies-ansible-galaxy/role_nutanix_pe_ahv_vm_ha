@@ -1,0 +1,7 @@
+enable_failover: {{ nutanix_prism_ha_failover_enabled }}
+{% if nutanix_prism_desired_ha_state == "BestEffort" %}
+num_host_failures_to_tolerate: 0
+{% else %}
+reservation_type: "{{ nutanix_prism_ha_reservation_type }}"
+num_host_failures_to_tolerate: {{ nutanix_prism_ha_host_failures }}
+{% endif %}
