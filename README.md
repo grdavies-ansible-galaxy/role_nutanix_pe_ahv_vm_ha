@@ -23,7 +23,7 @@ This Ansible role sets the VM HA configuration for a cluster running AHV via Pri
 
 This playbook will set the VM HA state to highly available (ie. VM reservation).
 
-```
+```YAML
 - hosts: localhost
   gather_facts: false
   roles:
