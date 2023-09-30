@@ -3,7 +3,7 @@
   uri:
     url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v2.0/cluster"
     method: GET
-    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_host_validate_certs }}"
     body_format: json
     headers:
       Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
@@ -39,9 +39,9 @@
 
 - name: Get current HA config
   uri:
-    url: "https://{{ role_nutanix_pe_ahv_vm_ha_host }}:{{ role_nutanix_pe_ahv_vm_ha_port }}/PrismGateway/services/rest/v2.0/ha"
+    url: "https://{{ role_nutanix_pe_ahv_vm_ha_host }}:{{ role_nutanix_pe_ahv_vm_ha_host_port }}/PrismGateway/services/rest/v2.0/ha"
     method: GET
-    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_host_validate_certs }}"
     body_format: json
     headers:
       Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"

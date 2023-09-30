@@ -5,7 +5,7 @@
     - role: ../..
   vars:
     role_nutanix_pe_ahv_vm_ha_host: 10.38.210.37
-    role_nutanix_pe_ahv_vm_ha_username: admin
-    role_nutanix_pe_ahv_vm_ha_password: nx2Tech193!
+    role_nutanix_pe_ahv_vm_ha_host_username: admin
+    role_nutanix_pe_ahv_vm_ha_host_password: nx2Tech193!
     role_nutanix_pe_ahv_vm_ha_debug: true
     role_nutanix_pe_ahv_vm_ha_desired_state: HighlyAvailable

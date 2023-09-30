@@ -33,7 +33,7 @@
   uri:
     url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v2.0/ha"
     method: PUT
-    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs }}"
+    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_host_validate_certs }}"
     body: "{{ lookup('template', 'ha.j2') | from_yaml | to_json }}"
     body_format: json
     status_code: 200
@@ -54,10 +54,10 @@
     name: grdavies.role_nutanix_prism_monitor_task
   vars:
     role_nutanix_prism_monitor_task_host: "{{ role_nutanix_pe_ahv_vm_ha_host }}"
-    role_nutanix_prism_monitor_task_username: "{{ role_nutanix_pe_ahv_vm_ha_username }}"
-    role_nutanix_prism_monitor_task_password: "{{ role_nutanix_pe_ahv_vm_ha_password }}"
-    role_nutanix_prism_monitor_task_port: "{{ role_nutanix_pe_ahv_vm_ha_port | default(omit) }}"
-    role_nutanix_prism_monitor_task_validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs | default(omit) }}"
+    role_nutanix_prism_monitor_task_host_username: "{{ role_nutanix_pe_ahv_vm_ha_host_username }}"
+    role_nutanix_prism_monitor_task_host_password: "{{ role_nutanix_pe_ahv_vm_ha_host_password }}"
+    role_nutanix_prism_monitor_task_host_port: "{{ role_nutanix_pe_ahv_vm_ha_host_port | default(omit) }}"
+    role_nutanix_prism_monitor_task_host_validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_host_validate_certs | default(omit) }}"
     role_nutanix_prism_monitor_task_debug: "{{ role_nutanix_pe_ahv_vm_ha_debug | default(omit) }}"
     role_nutanix_prism_monitor_task_uuid: "{{ role_nutanix_pe_ahv_vm_ha_update_task.json.task_uuid }}"
     role_nutanix_prism_monitor_task_retries: 60

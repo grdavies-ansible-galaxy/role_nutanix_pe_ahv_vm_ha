@@ -1,10 +1,10 @@
 ---
 # defaults file for nutanix_role_prism_ha
 role_nutanix_pe_ahv_vm_ha_host: ""
-role_nutanix_pe_ahv_vm_ha_username: ""
-role_nutanix_pe_ahv_vm_ha_password: ""
-role_nutanix_pe_ahv_vm_ha_port: 9440
-role_nutanix_pe_ahv_vm_ha_validate_certs: false
+role_nutanix_pe_ahv_vm_ha_host_username: ""
+role_nutanix_pe_ahv_vm_ha_host_password: ""
+role_nutanix_pe_ahv_vm_ha_host_port: 9440
+role_nutanix_pe_ahv_vm_ha_host_validate_certs: false
 role_nutanix_pe_ahv_vm_ha_debug: true
 role_nutanix_pe_ahv_vm_ha_state_defaults:
   - ha_state: BestEffort
