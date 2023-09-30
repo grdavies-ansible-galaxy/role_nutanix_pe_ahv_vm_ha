@@ -1,12 +1,12 @@
 ---
 # defaults file for nutanix_role_prism_ha
-nutanix_host: ""
-nutanix_username: ""
-nutanix_password: ""
-nutanix_port: 9440
-validate_certs: true
-nutanix_debug: true
-nutanix_prism_ha_state_defaults:
+role_nutanix_pe_ahv_vm_ha_host: ""
+role_nutanix_pe_ahv_vm_ha_username: ""
+role_nutanix_pe_ahv_vm_ha_password: ""
+role_nutanix_pe_ahv_vm_ha_port: 9440
+role_nutanix_pe_ahv_vm_ha_validate_certs: false
+role_nutanix_pe_ahv_vm_ha_debug: true
+role_nutanix_pe_ahv_vm_ha_state_defaults:
   - ha_state: BestEffort
     failover_enabled: true
     reservation_type: NO_RESERVATIONS
@@ -16,6 +16,6 @@ nutanix_prism_ha_state_defaults:
     reservation_type: RESERVE_SEGMENTS
     reservation_type_comparison: ReserveSegments
 
-nutanix_prism_allowed_ha_states:
+role_nutanix_pe_ahv_vm_ha_allowed_states:
   - BestEffort
   - HighlyAvailable

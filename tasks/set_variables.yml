@@ -1,50 +1,50 @@
 ---
 - name: Get current cluster configuration
   uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v2.0/cluster"
+    url: "https://{{ role_nutanix_prism_api_url_base }}/PrismGateway/services/rest/v2.0/cluster"
     method: GET
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs }}"
     body_format: json
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
     return_content: true
-  register: nutanix_prism_cluster_current_config
+  register: role_nutanix_pe_ahv_vm_ha_current_config
 
-- name: Debug nutanix_prism_cluster_current_config.json
+- name: Debug role_nutanix_pe_ahv_vm_ha_current_config.json
   debug:
-    var: nutanix_prism_cluster_current_config.json
+    var: role_nutanix_pe_ahv_vm_ha_current_config.json
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Set fact nutanix_hypervisor_is_ahv
+- name: Set fact role_nutanix_pe_ahv_vm_ha_cluster_is_ahv
   set_fact:
-    nutanix_hypervisor_is_ahv:
-  when: '"kKvm" in nutanix_prism_cluster_current_config.json.hypervisor_types'
+    role_nutanix_pe_ahv_vm_ha_cluster_is_ahv:
+  when: '"kKvm" in role_nutanix_pe_ahv_vm_ha_current_config.json.hypervisor_types'
 
-- name: Debug nutanix_hypervisor_is_ahv
+- name: Debug role_nutanix_pe_ahv_vm_ha_cluster_is_ahv
   debug:
-    var: nutanix_hypervisor_is_ahv
+    var: role_nutanix_pe_ahv_vm_ha_cluster_is_ahv
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Set fact cluster_rf_level
+- name: Set fact role_nutanix_pe_ahv_vm_ha_cluster_rf_level
   set_fact:
-    nutanix_cluster_rf_level: "{{ nutanix_prism_cluster_current_config.json.cluster_redundancy_state.current_redundancy_factor }}"
+    role_nutanix_pe_ahv_vm_ha_cluster_rf_level: "{{ role_nutanix_pe_ahv_vm_ha_current_config.json.cluster_redundancy_state.current_redundancy_factor }}"
 
-- name: Debug nutanix_cluster_rf_level
+- name: Debug role_nutanix_pe_ahv_vm_ha_cluster_rf_level
   debug:
-    var: nutanix_cluster_rf_level
+    var: role_nutanix_pe_ahv_vm_ha_cluster_rf_level
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
 - name: Get current HA config
   uri:
-    url: "https://{{ nutanix_host }}:{{ nutanix_port }}/PrismGateway/services/rest/v2.0/ha"
+    url: "https://{{ role_nutanix_pe_ahv_vm_ha_host }}:{{ role_nutanix_pe_ahv_vm_ha_port }}/PrismGateway/services/rest/v2.0/ha"
     method: GET
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ role_nutanix_pe_ahv_vm_ha_validate_certs }}"
     body_format: json
     headers:
-      Authorization: "{{ nutanix_api_auth }}"
+      Authorization: "{{ role_nutanix_prism_api_auth_string_b64 }}"
     return_content: true
   register: nutanix_prism_ha_current_config
 
@@ -52,74 +52,82 @@
   debug:
     var: nutanix_prism_ha_current_config.json
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Set default nutanix_prism_ha_failover_enabled for "{{ nutanix_prism_desired_ha_state }}"
+- name: Set default role_nutanix_pe_ahv_vm_ha_failover_enabled for "{{ role_nutanix_pe_ahv_vm_ha_desired_state }}"
   set_fact:
-    cluster_rf_level: "{{ nutanix_prism_cluster_current_config.json.cluster_redundancy_state.current_redundancy_factor }}"
-    nutanix_prism_ha_failover_enabled: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('failover_enabled') }}"
-    nutanix_prism_ha_res_type: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('reservation_type') }}"
-    nutanix_prism_ha_res_type_comp: "{{ nutanix_prism_ha_state_defaults | json_query(query) | first | json_query('reservation_type_comparison') }}"
+    role_nutanix_pe_ahv_vm_ha_failover_enabled: >-
+      {{ role_nutanix_pe_ahv_vm_ha_state_defaults
+      | json_query(query) | first
+      | json_query('failover_enabled') }}
+    role_nutanix_pe_ahv_vm_ha_reservation_type: >-
+      {{ role_nutanix_pe_ahv_vm_ha_state_defaults
+      | json_query(query) | first
+      | json_query('reservation_type') }}
+    role_nutanix_pe_ahv_vm_ha_reservation_type_comparison: >-
+      {{ role_nutanix_pe_ahv_vm_ha_state_defaults
+      | json_query(query) | first
+      | json_query('reservation_type_comparison') }}
   vars:
-    query: "[?ha_state==`{{ nutanix_prism_desired_ha_state }}`]"
+    query: "[?ha_state==`{{ role_nutanix_pe_ahv_vm_ha_desired_state }}`]"
   when:
-    - nutanix_prism_ha_failover_enabled is undefined
+    - role_nutanix_pe_ahv_vm_ha_failover_enabled is undefined
 
-- name: Debug nutanix_prism_ha_failover_enabled
+- name: Debug role_nutanix_pe_ahv_vm_ha_failover_enabled
   debug:
-    var: nutanix_prism_ha_failover_enabled
+    var: role_nutanix_pe_ahv_vm_ha_failover_enabled
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Debug nutanix_prism_ha_failover_enabled
+- name: Debug role_nutanix_pe_ahv_vm_ha_failover_enabled
   debug:
-    var: nutanix_prism_ha_failover_enabled
+    var: role_nutanix_pe_ahv_vm_ha_failover_enabled
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Debug nutanix_prism_ha_res_type
+- name: Debug role_nutanix_pe_ahv_vm_ha_reservation_type
   debug:
-    var: nutanix_prism_ha_res_type
+    var: role_nutanix_pe_ahv_vm_ha_reservation_type
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
 - name: Debug nutanix_prism_ha_res_type_comp
   debug:
     var: nutanix_prism_ha_res_type_comp
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Set default nutanix_prism_ha_host_failures for "{{ nutanix_prism_desired_ha_state }}"
+- name: Set default role_nutanix_pe_ahv_vm_ha_host_failures for "{{ role_nutanix_pe_ahv_vm_ha_desired_state }}"
   set_fact:
-    nutanix_prism_ha_host_failures: "{{ nutanix_cluster_rf_level | int - 1 }}"
+    role_nutanix_pe_ahv_vm_ha_host_failures: "{{ role_nutanix_pe_ahv_vm_ha_cluster_rf_level | int - 1 }}"
   when:
-    - nutanix_prism_ha_host_failures is undefined
-    - nutanix_prism_desired_ha_state != "BestEffort"
+    - role_nutanix_pe_ahv_vm_ha_host_failures is undefined
+    - role_nutanix_pe_ahv_vm_ha_desired_state != "BestEffort"
 
-- name: Debug nutanix_prism_ha_host_failures
+- name: Debug role_nutanix_pe_ahv_vm_ha_host_failures
   debug:
-    var: nutanix_prism_ha_host_failures
+    var: role_nutanix_pe_ahv_vm_ha_host_failures
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug
 
-- name: Set default nutanix_prism_ha_host_failures for "BestEffort"
+- name: Set default role_nutanix_pe_ahv_vm_ha_host_failures for "BestEffort"
   set_fact:
-    nutanix_prism_ha_host_failures: "0"
+    role_nutanix_pe_ahv_vm_ha_host_failures: "0"
   when:
-    - nutanix_prism_ha_host_failures is undefined
-    - nutanix_prism_desired_ha_state == "BestEffort"
+    - role_nutanix_pe_ahv_vm_ha_host_failures is undefined
+    - role_nutanix_pe_ahv_vm_ha_desired_state == "BestEffort"
 
 - name: Compare current HA config to desired state
   set_fact:
-    nutanix_prism_ha_update:
+    role_nutanix_pe_ahv_vm_ha_update:
   when:
-    ( nutanix_prism_ha_current_config.json.ha_state != nutanix_prism_desired_ha_state or
-    nutanix_prism_ha_current_config.json.failover_enabled != nutanix_prism_ha_failover_enabled or
-    nutanix_prism_ha_current_config.json.reservation_type != nutanix_prism_ha_res_type_comp or
-    nutanix_prism_ha_current_config.json.num_host_failures_to_tolerate | int != nutanix_prism_ha_host_failures | int )
+    ( nutanix_prism_ha_current_config.json.ha_state != role_nutanix_pe_ahv_vm_ha_desired_state or
+    nutanix_prism_ha_current_config.json.failover_enabled != role_nutanix_pe_ahv_vm_ha_failover_enabled or
+    nutanix_prism_ha_current_config.json.reservation_type != role_nutanix_pe_ahv_vm_ha_reservation_type_comparison or
+    nutanix_prism_ha_current_config.json.num_host_failures_to_tolerate | int != role_nutanix_pe_ahv_vm_ha_host_failures | int )
 
-- name: Debug nutanix_prism_ha_update
+- name: Debug role_nutanix_pe_ahv_vm_ha_update
   debug:
-    var: nutanix_prism_ha_update
+    var: role_nutanix_pe_ahv_vm_ha_update
   when:
-    - nutanix_debug
+    - role_nutanix_pe_ahv_vm_ha_debug

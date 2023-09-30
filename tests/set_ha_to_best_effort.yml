@@ -4,8 +4,8 @@
   roles:
     - role: ../..
   vars:
-    nutanix_host: 10.38.185.37
-    nutanix_username: admin
-    nutanix_password: nx2Tech165!
-    # nutanix_debug:  true
-    nutanix_prism_desired_ha_state: BestEffort
+    role_nutanix_pe_ahv_vm_ha_host: 10.38.210.37
+    role_nutanix_pe_ahv_vm_ha_username: admin
+    role_nutanix_pe_ahv_vm_ha_password: nx2Tech193!
+    role_nutanix_pe_ahv_vm_ha_debug: true
+    role_nutanix_pe_ahv_vm_ha_desired_state: BestEffort

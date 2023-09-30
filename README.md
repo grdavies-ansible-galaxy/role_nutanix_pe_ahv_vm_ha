@@ -2,11 +2,8 @@
 
 This Ansible role sets the VM HA configuration for a cluster running AHV via Prism Element.
 
-
 ## Role Variables
 
-| Variable                       | Required | Default  | Choices                                                                         | Comments                                                                                                                                                                                                                          |
-|--------------------------------|----------|----------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | nutanix_host                   | yes      |         |                                                                                 | The IP address or FQDN for the Prism (Element only) to which you want to connect.                                                                                                                                                  |
 | nutanix_username               | yes      |         |                                                                                 | A valid username with appropriate rights to access the Nutanix API.                                                                                                                                                                |
 | nutanix_password               | yes      |         |                                                                                 | A valid password for the supplied username.                                                                                                                                                                                        |
@@ -15,39 +12,43 @@ This Ansible role sets the VM HA configuration for a cluster running AHV via Pri
 | nutanix_prism_desired_ha_state | no       | no       |                                                                                 | Whether to check if Prism UI certificates are valid.                                                                                                                                                                              |
 | prism_desired_ha_state         | yes      |          | ['BestEffort', 'HighlyAvailable']                                               | The target HA state. BestEffort has no reservation and will restart VMs as long as there is sufficient capacity. HighlyAvailable reserves capacity for all powered on VMs and therefore guarantees capacity to power VMs back on. |
 
+| role_nutanix_pe_ahv_vm_ha_debug          | no       | false    | true / false                                                                    | Enable debug logging                                                                                                                                                                                                              |
+| role_nutanix_pe_ahv_vm_ha_desired_state  | yes      |          | ['BestEffort', 'HighlyAvailable']                                               | The target HA state. BestEffort has no reservation and will restart VMs as long as there is sufficient capacity. HighlyAvailable reserves capacity for all powered on VMs and therefore guarantees capacity to power VMs back on. |
 
 ## Dependencies
 
-NA
+- grdavies.role_nutanix_prism_api
+- grdavies.role_nutanix_prism_monitor_task
 
 ## Example Playbook
 
 This playbook will set the VM HA state to highly available (ie. VM reservation).
+
 ```
 - hosts: localhost
   gather_facts: false
   roles:
     - role: grdavies.role_nutanix_pe_ahv_vm_ha
   vars:
-    nutanix_host: 10.38.185.37
-    nutanix_username: admin
-    nutanix_password: nx2Tech165!
+    role_nutanix_pe_ahv_vm_ha_host: 10.38.185.37
+    role_nutanix_pe_ahv_vm_ha_username: admin
+    role_nutanix_pe_ahv_vm_ha_password: nx2Tech165!
     prism_desired_ha_state: HighlyAvailable
 ```
 
 This playbook will set the VM HA state to best effort.
+
 ```
 - hosts: localhost
   gather_facts: false
   roles:
     - role: grdavies.role_nutanix_pe_ahv_vm_ha
   vars:
-    nutanix_host: 10.38.185.37
-    nutanix_username: admin
-    nutanix_password: nx2Tech165!
+    role_nutanix_pe_ahv_vm_ha_host: 10.38.185.37
+    role_nutanix_pe_ahv_vm_ha_username: admin
+    role_nutanix_pe_ahv_vm_ha_password: nx2Tech165!
     prism_desired_ha_state: BestEffort
 ```
-
 
 ## License
 
